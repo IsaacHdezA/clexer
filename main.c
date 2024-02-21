@@ -3,6 +3,7 @@
 #include <string.h>
 
 // Macros
+#define myMalloc(type, len) ((type *) malloc(sizeof(type) * len))
 #define isWhitespace(c) (\
                           (c == '\t') ||\
                           (c == '\n') ||\
@@ -68,6 +69,21 @@ void trim(char *dest, char *src) {
   substring(dest, src, start, end);
 }
 
+char *getBytes(FILE *file, int *len) {
+  char fileBuffer[BUFFER_SIZE] = { 0 };
+  *len = 0;
+
+  while(fgets(fileBuffer, BUFFER_SIZE, file)) *len += strlen(fileBuffer);
+  rewind(file);
+
+  char *buffer = myMalloc(char, ++(*len));
+  memset(buffer, 0, *len);
+  while(fgets(fileBuffer, BUFFER_SIZE, file))
+    strncat(buffer, fileBuffer, strlen(fileBuffer));
+
+  return buffer;
+}
+
 void runFile(char *filename) {
   trim(filename, filename);
   printf("Running file \"%s\"", filename);
@@ -80,8 +96,13 @@ void runFile(char *filename) {
   }
   printf("\n\n");
 
-  // Get file character stream and run it
+  int buffSize = 0;
+  char *buffer = getBytes(file, &buffSize);
 
+  trim(buffer, buffer);
+  run(buffer, buffSize);
+
+  free(buffer);
   fclose(file);
 }
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "./includes/list.h"
 #include "./includes/utilities.h"
 
 // Global variables
@@ -27,7 +28,7 @@ int main(int argc, char **argv) {
 
 void runFile(char *filename) {
   trim(filename, filename);
-  printf("Running file \"%s\"", filename);
+  printf("Running file \"%s\"... ", filename);
 
   FILE *file = fopen(filename, "r");
 

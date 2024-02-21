@@ -1,13 +1,18 @@
 #ifndef LIST_H
 #define LIST_H
 
+#include "../includes/tokenType.h"
 #include "../includes/utilities.h"
 
 typedef struct token_t {
-  char value[BUFFER_SIZE];
+  TokenType type;
+  char lexeme[BUFFER_SIZE];
+  float literal;
+  int line;
+
 } Token;
 
-Token *createToken(char *str);
+Token *createToken(char *str, TokenType type);
 void printToken(Token *token);
 
 typedef struct node_t {
@@ -34,4 +39,4 @@ Node *pop(List *list);
 
 void printList(List *list);
 
-#endif // !LIST_H
+#endif // LIST_H

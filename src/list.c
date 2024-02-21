@@ -4,20 +4,42 @@
 
 #include "../includes/list.h"
 
+char *tokenNames[39] = {
+  "LEFT_PAREN", "RIGHT_PAREN", "LEFT_BRACE", "RIGHT_BRACE",
+  "COMMA", "DOT", "MINUS", "PLUS", "SEMICOLON", "SLASH", "STAR",
+
+  "BANG", "BANG_EQUAL",
+  "EQUAL", "EQUAL_EQUAL",
+  "GREATER", "GREATER_EQUAL",
+  "LESS", "LESS_EQUAL",
+
+  "IDENTIFIER", "STRING", "NUMBER",
+
+  "AND", "CLASS", "ELSE", "FALSE", "FUN", "FOR", "IF", "NIL", "OR",
+  "PRINT", "RETURN", "SUPER", "THIS", "TRUE", "VAR", "WHILE",
+
+  "EOF"
+};
+
 // Token functions
-Token *createToken(char *str) {
+Token *createToken(char *str, TokenType type) {
   int size = strlen(str);
 
   Token *token = myMalloc(Token, 1);
+  memset(token, 0, sizeof(Token));
 
-  memset(token, 0, sizeof(token));
-  strncpy(token->value, str, size);
+  strncpy(token->lexeme, str, size);
+  token->type = type;
+  if(type == NUMBER) token->literal = atof(token->lexeme);
+  else token->literal = -1;
 
   return token;
 }
 
 void printToken(Token *token) {
-  printf("\"%s\"", token->value);
+  printf("[%s] \"%s\"", tokenNames[token->type], token->lexeme);
+  if(token->type == NUMBER) printf(" (%f)", token->literal);
+  // printf("[%ud] \"%s\"", token->type, token->lexeme);
 }
 
 // Node functions
@@ -37,7 +59,6 @@ void freeNode(Node *node) {
 }
 
 void printNode(Node *node) {
-  printf("Token: ");
   printToken(node->token);
 }
 

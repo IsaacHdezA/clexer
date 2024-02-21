@@ -89,6 +89,7 @@ Node *pop(List *list) {
   }
 
   node->next = NULL;
+  list->size--;
 
   return popped;
 }
@@ -132,6 +133,7 @@ int main(int argc, char **argv) {
   printNode(popped);
   printf("\n");
 
+  printf("List (%d): ", list->size);
   printList(list);
 
   freeList(list);

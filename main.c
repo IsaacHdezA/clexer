@@ -78,8 +78,19 @@ void push(List *list, Token *token) {
 
   aux->next = createNode(token);
   list->size++;
+}
 
-  return;
+Node *pop(List *list) {
+  Node *node = list->head, *popped = node->next;
+
+  while(popped->next) {
+    node = node->next;
+    popped = node->next;
+  }
+
+  node->next = NULL;
+
+  return popped;
 }
 
 void printList(List *list) {
@@ -108,19 +119,23 @@ void freeList(List *list) {
 }
 
 int main(int argc, char **argv) {
-  Token *token1 = createToken("token 1"),
-        *token2 = createToken("token 2"),
-        *token3 = createToken("token 3");
   List *list = createList();
 
-  push(list, token1);
-  push(list, token2);
-  push(list, token3);
+  push(list, createToken("token 1"));
+  push(list, createToken("token 2"));
+  push(list, createToken("token 3"));
 
   printf("List (%d): ", list->size);
   printList(list);
 
+  Node *popped = pop(list);
+  printNode(popped);
+  printf("\n");
+
+  printList(list);
+
   freeList(list);
+  freeNode(popped);
 
   // if(argc > 2) {
   //   printf("Usage: clox [script]");

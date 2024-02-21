@@ -17,6 +17,12 @@
 // Constants
 #define BUFFER_SIZE 256
 
+// Enums
+typedef enum enum_e {
+  false = 0,
+  true = 1
+} boolean;
+
 // Custom string handling
 int rtrim(char *str, int len);
 int ltrim(char *str, int len);

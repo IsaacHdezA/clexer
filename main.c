@@ -1,37 +1,17 @@
 #include <stdio.h>
 #include <string.h>
 #include "./includes/utilities.h"
-#include "./includes/list.h"
 
 void runFile(char *filename);
 void runPrompt();
 void run(char *buffer, int size);
 
 int main(int argc, char **argv) {
-  List *list = createList();
-
-  push(list, createToken("token 1"));
-  push(list, createToken("token 2"));
-  push(list, createToken("token 3"));
-
-  printf("List (%d): ", list->size);
-  printList(list);
-
-  Node *popped = pop(list);
-  printNode(popped);
-  printf("\n");
-
-  printf("List (%d): ", list->size);
-  printList(list);
-
-  freeList(list);
-  freeNode(popped);
-
-  // if(argc > 2) {
-  //   printf("Usage: clox [script]");
-  //   return 64;
-  // } else if (argc == 2) runFile(argv[1]);
-  // else runPrompt();
+  if(argc > 2) {
+    printf("Usage: clox [script]");
+    return 64;
+  } else if (argc == 2) runFile(argv[1]);
+  else runPrompt();
 
   return 0;
 }
@@ -52,6 +32,8 @@ void runFile(char *filename) {
   char *buffer = getFileStream(file, &buffSize);
 
   trim(buffer, buffer);
+  buffSize = strlen(buffer);
+
   run(buffer, buffSize);
 
   free(buffer);

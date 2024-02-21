@@ -1,25 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-
-// Macros
-#define myMalloc(type, len) ((type *) malloc(sizeof(type) * len))
-#define isWhitespace(c) (\
-                          (c == '\t') ||\
-                          (c == '\n') ||\
-                          (c == '\v') ||\
-                          (c == '\f') ||\
-                          (c == '\r') ||\
-                          (c ==  ' ')\
-                        )
-
-// Constants
-#define BUFFER_SIZE 256
-
-int rtrim(char *str, int len);
-int ltrim(char *str, int len);
-void trim(char *dest, char *src);
-void substring(char *dest, char *src, int start, int end);
+#include "./includes/utilities.h"
 
 void runFile(char *filename);
 void runPrompt();
@@ -35,55 +16,6 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-int ltrim(char *str, int len) {
-  int start = 0;
-  while(isWhitespace(str[start])) start++;
-
-  return start;
-}
-
-int rtrim(char *str, int len) {
-  int end = len;
-  while(isWhitespace(str[end]) || str[end] == '\0') end--;
-
-  return end + 1;
-}
-
-
-void substring(char *dest, char *src, int start, int end) {
-  int i = 0;
-  for (i = 0; i < (end - start); i++) dest[i] = src[i + start];
-  dest[i] = '\0';
-}
-
-void trim(char *dest, char *src) {
-  if(src[0] == '\n') {
-    src[0] = '\0';
-    return;
-  }
-
-  int len   = strlen(src) - 1,
-      start = ltrim(src, len),
-      end   = rtrim(src, len);
-
-  substring(dest, src, start, end);
-}
-
-char *getBytes(FILE *file, int *len) {
-  char fileBuffer[BUFFER_SIZE] = { 0 };
-  *len = 0;
-
-  while(fgets(fileBuffer, BUFFER_SIZE, file)) *len += strlen(fileBuffer);
-  rewind(file);
-
-  char *buffer = myMalloc(char, ++(*len));
-  memset(buffer, 0, *len);
-  while(fgets(fileBuffer, BUFFER_SIZE, file))
-    strncat(buffer, fileBuffer, strlen(fileBuffer));
-
-  return buffer;
-}
-
 void runFile(char *filename) {
   trim(filename, filename);
   printf("Running file \"%s\"", filename);
@@ -97,7 +29,7 @@ void runFile(char *filename) {
   printf("\n\n");
 
   int buffSize = 0;
-  char *buffer = getBytes(file, &buffSize);
+  char *buffer = getFileStream(file, &buffSize);
 
   trim(buffer, buffer);
   run(buffer, buffSize);

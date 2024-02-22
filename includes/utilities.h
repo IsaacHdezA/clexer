@@ -32,4 +32,10 @@ char *char2str(char c);
 void substring(char *dest, char *src, int start, int end);
 char *getFileStream(FILE *file, int *len);
 
+// Error reporting and handling and so
+boolean hadError;
+
+void report(int line, char *where, char *message);
+void error(int line, char *message);
+
 #endif

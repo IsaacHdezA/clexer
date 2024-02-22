@@ -46,8 +46,10 @@ List *scanTokens(Scanner *scanner) {
   while(!isAtEnd(scanner)) {
     scanner->start = scanner->current;
     scanToken(scanner);
-    printList(scanner->tokens);
   }
+
+  push(scanner->tokens, createToken("", EoF, scanner->line));
+  return scanner->tokens;
 }
 
 void scanToken(Scanner *scanner) {
@@ -65,6 +67,10 @@ void scanToken(Scanner *scanner) {
     case ';': push(scanner->tokens, createCToken(c, SEMICOLON,   scanner->line)); break;
     // case '/': push(scanner->tokens, createCToken(c, SLASH,       scanner->line)); break;
     // case '*': push(scanner->tokens, createCToken(c, STAR,        scanner->line)); break;
+    
+    default:
+      error(scanner->line, "Unexpected character");
+    break;
   }
 }
 
@@ -77,9 +83,6 @@ void freeScanner(Scanner *scanner) {
   free(scanner->tokens);
   free(scanner);
 }
-
-// Global variables
-boolean hadError;
 
 void runFile(char *filename);
 void runPrompt();
@@ -144,16 +147,6 @@ void runPrompt() {
 
 void run(char *buffer, int size) {
   Scanner *scanner = createScanner(buffer);
-  scanTokens(scanner);
+  printList(scanTokens(scanner));
   freeScanner(scanner);
-}
-
-
-void error(int line, char *message) {
-  report(line, "", message);
-}
-
-void report(int line, char *where, char *message) {
-  fprintf(stderr, "[line %d] Error %s: %s\n", line, where, message);
-  hadError = true;
 }

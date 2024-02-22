@@ -57,3 +57,13 @@ char *char2str(char c) {
 
   return str;
 }
+
+void error(int line, char *message) {
+  report(line, "", message);
+}
+
+void report(int line, char *where, char *message) {
+  fprintf(stderr, "[line %d] Error %s: %s\n", line, where, message);
+  hadError = true;
+}
+

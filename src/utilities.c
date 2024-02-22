@@ -16,10 +16,16 @@ int rtrim(char *str, int len) {
   return end + 1;
 }
 
-void substring(char *dest, char *src, int start, int end) {
+char *substring(char *src, int start, int end) {
+  int size = (end - start);
+  char *dest = myMalloc(char, size + 1);
+  memset(dest, 0, sizeof(char));
+
   int i = 0;
-  for (i = 0; i < (end - start); i++) dest[i] = src[i + start];
+  for (i = 0; i < size; i++) dest[i] = src[i + start];
   dest[i] = '\0';
+
+  return dest;
 }
 
 void trim(char *dest, char *src) {
@@ -32,7 +38,7 @@ void trim(char *dest, char *src) {
       start = ltrim(src, len),
       end   = rtrim(src, len);
 
-  substring(dest, src, start, end);
+  dest = substring(src, start, end);
 }
 
 char *getFileStream(FILE *file, int *len) {

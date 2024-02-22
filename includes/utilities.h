@@ -29,7 +29,7 @@ int rtrim(char *str, int len);
 int ltrim(char *str, int len);
 void trim(char *dest, char *src);
 char *char2str(char c);
-void substring(char *dest, char *src, int start, int end);
+char *substring(char *src, int start, int end);
 char *getFileStream(FILE *file, int *len);
 
 // Error reporting and handling and so

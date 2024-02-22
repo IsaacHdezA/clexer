@@ -41,6 +41,8 @@ void freeScanner(Scanner *scanner);
 boolean isAtEnd(Scanner *scanner);
 List *scanTokens(Scanner *scanner);
 void scanToken(Scanner *scanner);
+void addToken(Scanner *scanner, TokenType type);
+boolean match(Scanner *scanner, char c);
 
 List *scanTokens(Scanner *scanner) {
   while(!isAtEnd(scanner)) {
@@ -56,17 +58,33 @@ void scanToken(Scanner *scanner) {
   char c = scanner->source[scanner->current++];
 
   switch(c) {
-    case '(': push(scanner->tokens, createCToken(c, LEFT_PAREN,  scanner->line)); break;
-    case ')': push(scanner->tokens, createCToken(c, RIGHT_PAREN, scanner->line)); break;
-    case '{': push(scanner->tokens, createCToken(c, LEFT_BRACE,  scanner->line)); break;
-    case '}': push(scanner->tokens, createCToken(c, RIGHT_BRACE, scanner->line)); break;
-    case ',': push(scanner->tokens, createCToken(c, COMMA,       scanner->line)); break;
-    case '.': push(scanner->tokens, createCToken(c, DOT,         scanner->line)); break;
-    case '-': push(scanner->tokens, createCToken(c, MINUS,       scanner->line)); break;
-    case '+': push(scanner->tokens, createCToken(c, PLUS,        scanner->line)); break;
-    case ';': push(scanner->tokens, createCToken(c, SEMICOLON,   scanner->line)); break;
-    // case '/': push(scanner->tokens, createCToken(c, SLASH,       scanner->line)); break;
-    // case '*': push(scanner->tokens, createCToken(c, STAR,        scanner->line)); break;
+    case '(': addToken(scanner,  LEFT_PAREN ); break;
+    case ')': addToken(scanner,  RIGHT_PAREN); break;
+    case '{': addToken(scanner,  LEFT_BRACE ); break;
+    case '}': addToken(scanner,  RIGHT_BRACE); break;
+    case ',': addToken(scanner,  COMMA      ); break;
+    case '.': addToken(scanner,  DOT        ); break;
+    case '-': addToken(scanner,  MINUS      ); break;
+    case '+': addToken(scanner,  PLUS       ); break;
+    case ';': addToken(scanner,  SEMICOLON  ); break;
+    // case '/': push(scanner, createCToken(c, SLASH,       scanner->line)); break;
+    // case '*': push(scanner, createCToken(c, STAR,        scanner->line)); break;
+    
+    case '!':
+        addToken(scanner, match(scanner, '=') ? BANG_EQUAL : BANG);
+    break;
+
+    case '=':
+        addToken(scanner, match(scanner, '=') ? EQUAL_EQUAL : EQUAL);
+    break;
+
+    case '>':
+        addToken(scanner, match(scanner, '=') ? GREATER_EQUAL : GREATER);
+    break;
+
+    case '<':
+        addToken(scanner, match(scanner, '=') ? LESS_EQUAL : LESS);
+    break;
     
     default:
       error(scanner->line, "Unexpected character");
@@ -74,8 +92,22 @@ void scanToken(Scanner *scanner) {
   }
 }
 
+void addToken(Scanner *scanner, TokenType type) {
+  char *token = substring(scanner->source, scanner->start, scanner->current);
+  push(scanner->tokens, createToken(token, type,  scanner->line));
+}
+
+
 boolean isAtEnd(Scanner *scanner) {
   return scanner->current >= scanner->size;
+}
+
+boolean match(Scanner *scanner, char expected) {
+  if(isAtEnd(scanner)) return false;
+  if(scanner->source[scanner->current] != expected) return false;
+
+  scanner->current++;
+  return true;
 }
 
 void freeScanner(Scanner *scanner) {

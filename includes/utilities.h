@@ -1,6 +1,7 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
+#include <stdio.h>
 #include <stdlib.h>
 
 // Macros

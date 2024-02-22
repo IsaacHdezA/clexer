@@ -1,5 +1,8 @@
-#ifndef TOKENTYPE_H
-#define TOKENTYPE_H
+#ifndef TOKEN_H
+#define TOKEN_H
+
+#include <string.h>
+#include "../includes/utilities.h"
 
 typedef enum token_e {
   // Single-character tokens
@@ -21,5 +24,16 @@ typedef enum token_e {
 
   EoF
 } TokenType;
+
+typedef struct token_t {
+  TokenType type;
+  char lexeme[BUFFER_SIZE];
+  float literal;
+  int line;
+
+} Token;
+
+Token *createToken(char *str, TokenType type, int line);
+void printToken(Token *token);
 
 #endif

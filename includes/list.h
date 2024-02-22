@@ -1,19 +1,8 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include "../includes/tokenType.h"
+#include "../includes/token.h"
 #include "../includes/utilities.h"
-
-typedef struct token_t {
-  TokenType type;
-  char lexeme[BUFFER_SIZE];
-  float literal;
-  int line;
-
-} Token;
-
-Token *createToken(char *str, TokenType type);
-void printToken(Token *token);
 
 typedef struct node_t {
   Token *token;

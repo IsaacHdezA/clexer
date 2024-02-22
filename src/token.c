@@ -34,6 +34,10 @@ Token *createToken(char *str, TokenType type, int line) {
   return token;
 }
 
+Token *createCToken(char c, TokenType type, int line) {
+  return createToken(char2str(c), type, line);
+}
+
 void printToken(Token *token) {
   printf("[%s] \"%s\"", tokenNames[token->type], token->lexeme);
   if(token->type == NUMBER) printf(" (%f)", token->literal);

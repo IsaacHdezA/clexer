@@ -1,7 +1,82 @@
 #include <stdio.h>
 #include <string.h>
+
 #include "./includes/list.h"
+#include "./includes/token.h"
 #include "./includes/utilities.h"
+
+typedef struct scanner_t {
+  char *source;
+  List *tokens;
+  int size;
+
+  int start;
+  int current;
+  int line;
+
+} Scanner;
+
+Scanner *createScanner(char *source) {
+  Scanner *scanner = myMalloc(Scanner, 1);
+  memset(scanner, 0, sizeof(Scanner));
+
+  // scanner->source = source; // Might only copy it
+
+  scanner->size = strlen(source);
+
+  scanner->source = myMalloc(char, scanner->size + 1);
+  memset(scanner->source, 0, scanner->size + 1);
+  strncpy(scanner->source, source, scanner->size + 1);
+
+  scanner->tokens = createList();
+  scanner->start = 0;
+  scanner->current = 0;
+  scanner->line = 1;
+
+  return scanner;
+}
+
+Scanner *createScanner(char *source);
+void freeScanner(Scanner *scanner);
+boolean isAtEnd(Scanner *scanner);
+List *scanTokens(Scanner *scanner);
+void scanToken(Scanner *scanner);
+
+List *scanTokens(Scanner *scanner) {
+  while(!isAtEnd(scanner)) {
+    scanner->start = scanner->current;
+    scanToken(scanner);
+    printList(scanner->tokens);
+  }
+}
+
+void scanToken(Scanner *scanner) {
+  char c = scanner->source[scanner->current++];
+
+  switch(c) {
+    case '(': push(scanner->tokens, createCToken(c, LEFT_PAREN,  scanner->line)); break;
+    case ')': push(scanner->tokens, createCToken(c, RIGHT_PAREN, scanner->line)); break;
+    case '{': push(scanner->tokens, createCToken(c, LEFT_BRACE,  scanner->line)); break;
+    case '}': push(scanner->tokens, createCToken(c, RIGHT_BRACE, scanner->line)); break;
+    case ',': push(scanner->tokens, createCToken(c, COMMA,       scanner->line)); break;
+    case '.': push(scanner->tokens, createCToken(c, DOT,         scanner->line)); break;
+    case '-': push(scanner->tokens, createCToken(c, MINUS,       scanner->line)); break;
+    case '+': push(scanner->tokens, createCToken(c, PLUS,        scanner->line)); break;
+    case ';': push(scanner->tokens, createCToken(c, SEMICOLON,   scanner->line)); break;
+    // case '/': push(scanner->tokens, createCToken(c, SLASH,       scanner->line)); break;
+    // case '*': push(scanner->tokens, createCToken(c, STAR,        scanner->line)); break;
+  }
+}
+
+boolean isAtEnd(Scanner *scanner) {
+  return scanner->current >= scanner->size;
+}
+
+void freeScanner(Scanner *scanner) {
+  free(scanner->source);
+  free(scanner->tokens);
+  free(scanner);
+}
 
 // Global variables
 boolean hadError;
@@ -68,7 +143,9 @@ void runPrompt() {
 }
 
 void run(char *buffer, int size) {
-  printf("(%d bytes) \"%s\"\n", size, buffer);
+  Scanner *scanner = createScanner(buffer);
+  scanTokens(scanner);
+  freeScanner(scanner);
 }
 
 

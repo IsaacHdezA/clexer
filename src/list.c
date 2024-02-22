@@ -28,6 +28,7 @@ void printNode(Node *node) {
 // List functions
 List *createList() {
   List *list = myMalloc(List, 1);
+  memset(list, 0, sizeof(List));
 
   list->head = NULL;
   list->size = 0;

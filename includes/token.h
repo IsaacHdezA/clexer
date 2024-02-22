@@ -34,6 +34,7 @@ typedef struct token_t {
 } Token;
 
 Token *createToken(char *str, TokenType type, int line);
+Token *createCToken(char c, TokenType type, int line);
 void printToken(Token *token);
 
 #endif

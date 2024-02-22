@@ -16,7 +16,6 @@ int rtrim(char *str, int len) {
   return end + 1;
 }
 
-
 void substring(char *dest, char *src, int start, int end) {
   int i = 0;
   for (i = 0; i < (end - start); i++) dest[i] = src[i + start];
@@ -49,4 +48,12 @@ char *getFileStream(FILE *file, int *len) {
     strncat(buffer, fileBuffer, strlen(fileBuffer));
 
   return buffer;
+}
+
+char *char2str(char c) {
+  char *str = myMalloc(char, 1);
+  memset(str, 0, sizeof(char));
+  str[0] = c;
+
+  return str;
 }

@@ -16,25 +16,33 @@ int rtrim(char *str, int len) {
   return end + 1;
 }
 
-
 void substring(char *dest, char *src, int start, int end) {
   int i = 0;
   for (i = 0; i < (end - start); i++) dest[i] = src[i + start];
   dest[i] = '\0';
 }
 
-// void trim(char *dest, char *src) {
-//   if(src[0] == '\n') {
-//     src[0] = '\0';
-//     return;
-//   }
-// 
-//   int len   = strlen(src) - 1,
-//       start = ltrim(src, len),
-//       end   = rtrim(src, len);
-// 
-//   substring(dest, src, start, end);
-// }
+char *trim(char *src) {
+  char *out = NULL;
+
+  if(src[0] == '\n' || src[0] == '\0') {
+    out = myMalloc(char, 1);
+    out[0] = '\0';
+
+    return out;
+  }
+  
+  int len = strlen(src),
+      start = ltrim(src, len),
+      end   = rtrim(src, len);
+
+  len = end - start;
+  out = myMalloc(char, len + 1);
+  memset(out, 0, len + 1);
+  substring(out, src, start, end);
+  
+  return out;
+}
 
 char *getFileStream(FILE *file, int *len) {
   char fileBuffer[BUFFER_SIZE] = { 0 };

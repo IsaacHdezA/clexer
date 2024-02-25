@@ -82,20 +82,30 @@ void runFile(char *filename) {
 }
 
 void runPrompt() {
-  // char buffer[BUFFER_SIZE] = { 0 };
+  char *buffer = myMalloc(char, BUFFER_SIZE),
+       *aux = buffer;
 
-  // printf("Starting REPL...\n");
-  // printf("Lox > ");
+  printf("Starting REPL...\n");
+  printf("Lox > ");
 
-  // while(fgets(buffer, BUFFER_SIZE, stdin)) {
-  //   trim(buffer, buffer);
-  //   run(buffer, strlen(buffer));
-  //   printf("Lox > ");
+  while(fgets(buffer, BUFFER_SIZE, stdin)) {
+    buffer = trim(buffer);
 
-  //   hadError = false;
-  // }
+    run(buffer, strlen(buffer));
+    printf("Lox > ");
 
-  // printf("\n");
+    hadError = false;
+
+    // Restarting the buffers
+    free(aux);
+    free(buffer);
+
+    buffer = myMalloc(char, BUFFER_SIZE);
+    aux = buffer;
+  }
+
+  printf("\n");
+  free(buffer);
 }
 
 void run(char *buffer, int size) {

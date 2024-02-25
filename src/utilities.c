@@ -23,18 +23,18 @@ void substring(char *dest, char *src, int start, int end) {
   dest[i] = '\0';
 }
 
-void trim(char *dest, char *src) {
-  if(src[0] == '\n') {
-    src[0] = '\0';
-    return;
-  }
-
-  int len   = strlen(src) - 1,
-      start = ltrim(src, len),
-      end   = rtrim(src, len);
-
-  substring(dest, src, start, end);
-}
+// void trim(char *dest, char *src) {
+//   if(src[0] == '\n') {
+//     src[0] = '\0';
+//     return;
+//   }
+// 
+//   int len   = strlen(src) - 1,
+//       start = ltrim(src, len),
+//       end   = rtrim(src, len);
+// 
+//   substring(dest, src, start, end);
+// }
 
 char *getFileStream(FILE *file, int *len) {
   char fileBuffer[BUFFER_SIZE] = { 0 };

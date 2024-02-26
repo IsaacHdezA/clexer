@@ -31,9 +31,17 @@ int start = 0;
 int current = 0;
 int line = 1;
 
-void addToken(List *list, TokenType tokenType, char *source) {
-  // TODO: Also update Token struct to also use dynamic strings
-  // push(list, createToken());
+void addToken(List *list, TokenType type, char *source) {
+  // TODO: Change substring again so it returns a string ffs.
+  //       That means changing trim again god dammit
+  // push(
+  //     list,
+  //     createToken(
+  //       substring(source, start, current)
+  //       type,
+  //       line
+  //     )
+  // );
 }
 
 void scanToken(List *tokens, char *source, int length) {

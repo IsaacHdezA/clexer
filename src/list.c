@@ -17,7 +17,7 @@ Node *createNode(Token *token) {
 }
 
 void freeNode(Node *node) {
-  free(node->token);
+  freeToken(node->token);
   free(node);
 }
 

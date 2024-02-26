@@ -26,6 +26,34 @@ int main(int argc, char **argv) {
   return 0;
 }
 
+// Scanner
+int start = 0;
+int current = 0;
+int line = 1;
+
+void addToken(List *list, TokenType tokenType, char *source) {
+  // TODO: Also update Token struct to also use dynamic strings
+  // push(list, createToken());
+}
+
+void scanToken(List *tokens, char *source, int length) {
+  char c = source[current++];
+
+  switch(c) {}
+
+}
+
+List *scanTokens(char *source, int length) {
+  List *tokens = createList();
+
+  while(current <= length) {
+    start = current;
+    scanToken(tokens, source, length);
+  }
+
+  push(tokens, createToken("", EoF, line));
+}
+
 void runFile(char *filename) {
   filename = trim(filename);
   printf("Running file \"%s\"... ", filename);
@@ -87,7 +115,15 @@ void runPrompt() {
 }
 
 void run(char *buffer, int size) {
-  printf("(%d bytes) \"%s\"\n", size, buffer);
+  // Initialize scanner
+  printf("Initializing scanner...\n");
+  List *tokens = scanTokens(buffer, size);
+
+  printf("(%d bytes) \"%s\"\n\tTokens: ", size, buffer);
+  printList(tokens);
+
+  // Freeing scanner
+  freeList(tokens);
 }
 
 void error(int line, char *message) {

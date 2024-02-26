@@ -44,6 +44,14 @@ void addToken(List *list, TokenType type, char *source) {
   free(str);
 }
 
+boolean match(char expected, int length, char *source) {
+  if(current >= length) return false;
+  if(source[current] != expected) return false;
+
+  current++;
+  return true;
+}
+
 void scanToken(List *tokens, char *source, int length) {
   char c = source[current++];
 
@@ -58,6 +66,24 @@ void scanToken(List *tokens, char *source, int length) {
     case '+': addToken(tokens, PLUS,        source); break;
     case ';': addToken(tokens, SEMICOLON,   source); break;
     case '*': addToken(tokens, STAR,        source); break;
+
+    case '!':
+      addToken( tokens, match('=', length, source) ? BANG_EQUAL : BANG, source);
+    break;
+
+    case '=':
+      addToken(tokens, match('=', length, source) ? EQUAL_EQUAL : EQUAL, source);
+    break;
+
+    case '<':
+      addToken(tokens, match('=', length, source) ? LESS_EQUAL : LESS, source);
+    break;
+
+    case '>':
+      addToken(tokens, match('=', length, source) ? GREATER_EQUAL : GREATER, source);
+    break;
+
+    default: error(line, "Unexpected character.");
   }
 }
 
@@ -71,6 +97,7 @@ List *scanTokens(char *source, int length) {
 
   push(tokens, createToken("", EoF, line));
 }
+// End scanner
 
 void runFile(char *filename) {
   filename = trim(filename);
@@ -137,7 +164,6 @@ void run(char *buffer, int size) {
   start = 0;
   current = 0;
   line = 1;
-  printf("Initializing scanner...\n");
   List *tokens = scanTokens(buffer, size);
 
   printf("(%d bytes) \"%s\"\n\tTokens: ", size, buffer);

@@ -16,10 +16,16 @@ int rtrim(char *str, int len) {
   return end + 1;
 }
 
-void substring(char *dest, char *src, int start, int end) {
+char *substring(char *src, int start, int end) {
+  int size = (end - start);
+  char *dest = myMalloc(char, size + 1);
+  memset(dest, 0, size + 1);
+
   int i = 0;
   for (i = 0; i < (end - start); i++) dest[i] = src[i + start];
   dest[i] = '\0';
+
+  return dest;
 }
 
 char *trim(char *src) {
@@ -36,10 +42,7 @@ char *trim(char *src) {
       start = ltrim(src, len),
       end   = rtrim(src, len);
 
-  len = end - start;
-  out = myMalloc(char, len + 1);
-  memset(out, 0, len + 1);
-  substring(out, src, start, end);
+  out = substring(src, start, end);
   
   return out;
 }

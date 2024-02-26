@@ -27,7 +27,7 @@ typedef enum enum_e {
 // Custom string handling
 int rtrim(char *str, int len);
 int ltrim(char *str, int len);
-void substring(char *dest, char *src, int start, int end);
+char *substring(char *src, int start, int end);
 char *trim(char *src);
 char *getFileStream(FILE *file, int *len);
 

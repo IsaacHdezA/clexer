@@ -32,23 +32,33 @@ int current = 0;
 int line = 1;
 
 void addToken(List *list, TokenType type, char *source) {
-  // TODO: Change substring again so it returns a string ffs.
-  //       That means changing trim again god dammit
-  // push(
-  //     list,
-  //     createToken(
-  //       substring(source, start, current)
-  //       type,
-  //       line
-  //     )
-  // );
+  char *str = substring(source, start, current);
+  push(
+      list,
+      createToken(
+        str,
+        type,
+        line
+      )
+  );
+  free(str);
 }
 
 void scanToken(List *tokens, char *source, int length) {
   char c = source[current++];
 
-  switch(c) {}
-
+  switch(c) {
+    case '(': addToken(tokens, LEFT_PAREN,  source); break;
+    case ')': addToken(tokens, RIGHT_PAREN, source); break;
+    case '{': addToken(tokens, LEFT_BRACE,  source); break;
+    case '}': addToken(tokens, RIGHT_BRACE, source); break;
+    case ',': addToken(tokens, COMMA,       source); break;
+    case '.': addToken(tokens, DOT,         source); break;
+    case '-': addToken(tokens, MINUS,       source); break;
+    case '+': addToken(tokens, PLUS,        source); break;
+    case ';': addToken(tokens, SEMICOLON,   source); break;
+    case '*': addToken(tokens, STAR,        source); break;
+  }
 }
 
 List *scanTokens(char *source, int length) {
@@ -124,6 +134,9 @@ void runPrompt() {
 
 void run(char *buffer, int size) {
   // Initialize scanner
+  start = 0;
+  current = 0;
+  line = 1;
   printf("Initializing scanner...\n");
   List *tokens = scanTokens(buffer, size);
 

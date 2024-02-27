@@ -31,29 +31,27 @@ int start = 0;
 int current = 0;
 int line = 1;
 
-void addToken(List *list, TokenType type, char *source) {
-  char *str = substring(source, start, current);
-  push(
-      list,
-      createToken(
-        str,
-        type,
-        line
-      )
-  );
-  free(str);
-}
+char peek(char *source, int length);
+char advance(char *source, int length);
+boolean match(char expected, char *source, int length);
 
-boolean match(char expected, int length, char *source) {
-  if(current >= length) return false;
-  if(source[current] != expected) return false;
+void addToken(List *list, TokenType type, char *source);
+void scanToken(List *tokens, char *source, int length);
+List *scanTokens(char *source, int length);
 
-  current++;
-  return true;
+List *scanTokens(char *source, int length) {
+  List *tokens = createList();
+
+  while(current <= length) {
+    start = current;
+    scanToken(tokens, source, length);
+  }
+
+  push(tokens, createToken("", EoF, line));
 }
 
 void scanToken(List *tokens, char *source, int length) {
-  char c = source[current++];
+  char c = advance(source, length);
 
   switch(c) {
     case '(': addToken(tokens, LEFT_PAREN,  source); break;
@@ -68,34 +66,63 @@ void scanToken(List *tokens, char *source, int length) {
     case '*': addToken(tokens, STAR,        source); break;
 
     case '!':
-      addToken( tokens, match('=', length, source) ? BANG_EQUAL : BANG, source);
+      addToken( tokens, match('=', source, length) ? BANG_EQUAL : BANG, source);
     break;
 
     case '=':
-      addToken(tokens, match('=', length, source) ? EQUAL_EQUAL : EQUAL, source);
+      addToken(tokens, match('=', source, length) ? EQUAL_EQUAL : EQUAL, source);
     break;
 
     case '<':
-      addToken(tokens, match('=', length, source) ? LESS_EQUAL : LESS, source);
+      addToken(tokens, match('=', source, length) ? LESS_EQUAL : LESS, source);
     break;
 
     case '>':
-      addToken(tokens, match('=', length, source) ? GREATER_EQUAL : GREATER, source);
+      addToken(tokens, match('=', source, length) ? GREATER_EQUAL : GREATER, source);
     break;
 
+    case '/':
+      if(match('/', source, length)) {
+        // A comment goes until the end of the line
+        while(peek(source, length) != '\n' && current <= length) advance(source, length);
+      } else addToken(tokens, SLASH, source);
+    break;
     default: error(line, "Unexpected character.");
   }
 }
 
-List *scanTokens(char *source, int length) {
-  List *tokens = createList();
+void addToken(List *list, TokenType type, char *source) {
+  char *str = substring(source, start, current);
+  push(
+      list,
+      createToken(
+        str,
+        type,
+        line
+      )
+  );
+  free(str);
+}
 
-  while(current <= length) {
-    start = current;
-    scanToken(tokens, source, length);
-  }
 
-  push(tokens, createToken("", EoF, line));
+// Like advance but without consuming the character (only lookahead)
+char peek(char *source, int length) {
+  if(current >= length) return '\n';
+  return source[current];
+}
+
+// Consumes the current character
+char advance(char *source, int length) {
+  return source[current++];
+}
+
+// peek() + advance()
+boolean match(char expected, char *source, int length) {
+  if(current >= length) return false;
+  if(source[current] != expected) return false;
+
+  current++;
+  return true;
 }
 // End scanner
 

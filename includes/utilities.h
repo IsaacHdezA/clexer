@@ -7,6 +7,12 @@
 // Macros
 #define myMalloc(type, len) ((type *) malloc(sizeof(type) * len))
 #define isDigit(c) (c >= '0' && c <= '9')
+#define isAlpha(c) (\
+                     (c >= 'A' && c <= 'Z') ||\
+                     (c >= 'a' && c <= 'z') ||\
+                     (c == '_')\
+                   )
+#define isAlphanumeric(c) (isAlpha(c) || isDigit(c))
 #define isWhitespace(c) (\
                           (c == '\t') ||\
                           (c == '\n') ||\

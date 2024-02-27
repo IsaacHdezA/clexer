@@ -38,6 +38,7 @@ boolean match(char expected, char *source, int length);
 
 void string(List *tokens, char *source, int length);
 void number(List *tokens, char *source, int length);
+void identifier(List *tokens, char *source, int length);
 
 void addToken(List *tokens, TokenType type, char *source);
 void scanToken(List *tokens, char *source, int length);
@@ -106,6 +107,7 @@ void scanToken(List *tokens, char *source, int length) {
 
     default:
       if(isDigit(c)) number(tokens, source, length);
+      else if(isAlpha(c)) identifier(tokens, source, length);
       else error(line, "Unexpected character.");
 
     break;
@@ -191,6 +193,14 @@ void number(List *tokens, char *source, int length) {
   }
 
   addToken(tokens, NUMBER, source);
+}
+
+void identifier(List *tokens, char *source, int length) {
+  while(isAlphanumeric(peek(source, length))) advance(source, length);
+
+  // TODO: Handle keywords (need to create my own Hash Map)
+
+  addToken(tokens, IDENTIFIER, source);
 }
 // End scanner
 

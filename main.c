@@ -35,7 +35,9 @@ char peek(char *source, int length);
 char advance(char *source, int length);
 boolean match(char expected, char *source, int length);
 
-void addToken(List *list, TokenType type, char *source);
+void string(List *tokens, char *source, int length);
+
+void addToken(List *tokens, TokenType type, char *source);
 void scanToken(List *tokens, char *source, int length);
 List *scanTokens(char *source, int length);
 
@@ -87,7 +89,20 @@ void scanToken(List *tokens, char *source, int length) {
         while(peek(source, length) != '\n' && current <= length) advance(source, length);
       } else addToken(tokens, SLASH, source);
     break;
-    default: error(line, "Unexpected character.");
+
+    // TODO: Fix trim function so it doesn't fucking break when entering a single space
+    case ' ':
+    case '\r':
+    case '\t':
+    break;
+
+    case '\n': line++; break;
+
+    case '"':
+      string(tokens, source, length); break;
+    break;
+
+    default: error(line, "Unexpected character."); break;
   }
 }
 
@@ -103,7 +118,6 @@ void addToken(List *list, TokenType type, char *source) {
   );
   free(str);
 }
-
 
 // Like advance but without consuming the character (only lookahead)
 char peek(char *source, int length) {
@@ -123,6 +137,33 @@ boolean match(char expected, char *source, int length) {
 
   current++;
   return true;
+}
+
+// TODO: Fix that weird "error" that pops when inserting strings
+void string(List *tokens, char *source, int length) {
+  while(peek(source, length) != '"' && current <= length) {
+    if(peek(source, length) == '\n') line++;
+    advance(source, length);
+  }
+
+  if(current >= length) {
+    error(line, "Unterminated string.");
+    return;
+  }
+
+  // The closing ".
+  advance(source, length);
+
+  char *str = substring(source, start + 1, current - 1);
+  push(
+      tokens,
+      createToken(
+        str,
+        STRING,
+        line
+      )
+  );
+  free(str);
 }
 // End scanner
 

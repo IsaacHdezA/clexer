@@ -6,6 +6,7 @@
 
 // Macros
 #define myMalloc(type, len) ((type *) malloc(sizeof(type) * len))
+#define isDigit(c) (c >= '0' && c <= '9')
 #define isWhitespace(c) (\
                           (c == '\t') ||\
                           (c == '\n') ||\

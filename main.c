@@ -32,10 +32,12 @@ int current = 0;
 int line = 1;
 
 char peek(char *source, int length);
+char peekNext(char *source, int length);
 char advance(char *source, int length);
 boolean match(char expected, char *source, int length);
 
 void string(List *tokens, char *source, int length);
+void number(List *tokens, char *source, int length);
 
 void addToken(List *tokens, TokenType type, char *source);
 void scanToken(List *tokens, char *source, int length);
@@ -102,7 +104,11 @@ void scanToken(List *tokens, char *source, int length) {
       string(tokens, source, length); break;
     break;
 
-    default: error(line, "Unexpected character."); break;
+    default:
+      if(isDigit(c)) number(tokens, source, length);
+      else error(line, "Unexpected character.");
+
+    break;
   }
 }
 
@@ -121,8 +127,14 @@ void addToken(List *list, TokenType type, char *source) {
 
 // Like advance but without consuming the character (only lookahead)
 char peek(char *source, int length) {
-  if(current >= length) return '\n';
+  if(current >= length) return '\0';
   return source[current];
+}
+
+char peekNext(char *source, int length) {
+  if(current + 1 >= length) return '\0';
+
+  return source[current + 1];
 }
 
 // Consumes the current character
@@ -155,6 +167,8 @@ void string(List *tokens, char *source, int length) {
   advance(source, length);
 
   char *str = substring(source, start + 1, current - 1);
+  // Maybe add another addToken variant for this part instead of inserting it
+  // so raw.
   push(
       tokens,
       createToken(
@@ -164,6 +178,19 @@ void string(List *tokens, char *source, int length) {
       )
   );
   free(str);
+}
+
+void number(List *tokens, char *source, int length) {
+  while(isDigit(peek(source, length))) advance(source, length);
+
+  if(peek(source, length) == '.' && isDigit(peekNext(source, length))) {
+    // Consume "."
+    advance(source, length);
+
+    while(isDigit(peek(source, length))) advance(source, length);
+  }
+
+  addToken(tokens, NUMBER, source);
 }
 // End scanner
 

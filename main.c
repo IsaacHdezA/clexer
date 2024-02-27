@@ -136,14 +136,194 @@ int main(int argc, char **argv) {
   return 0;
 }
 
+// Scanner
+int start = 0;
+int current = 0;
+int line = 1;
+
+char peek(char *source, int length);
+char peekNext(char *source, int length);
+char advance(char *source, int length);
+boolean match(char expected, char *source, int length);
+
+void string(List *tokens, char *source, int length);
+void number(List *tokens, char *source, int length);
+void identifier(List *tokens, char *source, int length);
+
+void addToken(List *tokens, TokenType type, char *source);
+void scanToken(List *tokens, char *source, int length);
+List *scanTokens(char *source, int length);
+
+List *scanTokens(char *source, int length) {
+  List *tokens = createList();
+
+  while(current <= length) {
+    start = current;
+    scanToken(tokens, source, length);
+  }
+
+  push(tokens, createToken("", EoF, line));
+}
+
+void scanToken(List *tokens, char *source, int length) {
+  char c = advance(source, length);
+
+  switch(c) {
+    case '(': addToken(tokens, LEFT_PAREN,  source); break;
+    case ')': addToken(tokens, RIGHT_PAREN, source); break;
+    case '{': addToken(tokens, LEFT_BRACE,  source); break;
+    case '}': addToken(tokens, RIGHT_BRACE, source); break;
+    case ',': addToken(tokens, COMMA,       source); break;
+    case '.': addToken(tokens, DOT,         source); break;
+    case '-': addToken(tokens, MINUS,       source); break;
+    case '+': addToken(tokens, PLUS,        source); break;
+    case ';': addToken(tokens, SEMICOLON,   source); break;
+    case '*': addToken(tokens, STAR,        source); break;
+
+    case '!':
+      addToken( tokens, match('=', source, length) ? BANG_EQUAL : BANG, source);
+    break;
+
+    case '=':
+      addToken(tokens, match('=', source, length) ? EQUAL_EQUAL : EQUAL, source);
+    break;
+
+    case '<':
+      addToken(tokens, match('=', source, length) ? LESS_EQUAL : LESS, source);
+    break;
+
+    case '>':
+      addToken(tokens, match('=', source, length) ? GREATER_EQUAL : GREATER, source);
+    break;
+
+    case '/':
+      if(match('/', source, length)) {
+        // A comment goes until the end of the line
+        while(peek(source, length) != '\n' && current <= length) advance(source, length);
+      } else addToken(tokens, SLASH, source);
+    break;
+
+    // TODO: Fix trim function so it doesn't fucking break when entering a single space
+    case ' ':
+    case '\r':
+    case '\t':
+    break;
+
+    case '\n': line++; break;
+
+    case '"':
+      string(tokens, source, length); break;
+    break;
+
+    default:
+      if(isDigit(c)) number(tokens, source, length);
+      else if(isAlpha(c)) identifier(tokens, source, length);
+      else error(line, "Unexpected character.");
+
+    break;
+  }
+}
+
+void addToken(List *list, TokenType type, char *source) {
+  char *str = substring(source, start, current);
+  push(
+      list,
+      createToken(
+        str,
+        type,
+        line
+      )
+  );
+  free(str);
+}
+
+// Like advance but without consuming the character (only lookahead)
+char peek(char *source, int length) {
+  if(current >= length) return '\0';
+  return source[current];
+}
+
+char peekNext(char *source, int length) {
+  if(current + 1 >= length) return '\0';
+
+  return source[current + 1];
+}
+
+// Consumes the current character
+char advance(char *source, int length) {
+  return source[current++];
+}
+
+// peek() + advance()
+boolean match(char expected, char *source, int length) {
+  if(current >= length) return false;
+  if(source[current] != expected) return false;
+
+  current++;
+  return true;
+}
+
+// TODO: Fix that weird "error" that pops when inserting strings
+void string(List *tokens, char *source, int length) {
+  while(peek(source, length) != '"' && current <= length) {
+    if(peek(source, length) == '\n') line++;
+    advance(source, length);
+  }
+
+  if(current >= length) {
+    error(line, "Unterminated string.");
+    return;
+  }
+
+  // The closing ".
+  advance(source, length);
+
+  char *str = substring(source, start + 1, current - 1);
+  // Maybe add another addToken variant for this part instead of inserting it
+  // so raw.
+  push(
+      tokens,
+      createToken(
+        str,
+        STRING,
+        line
+      )
+  );
+  free(str);
+}
+
+void number(List *tokens, char *source, int length) {
+  while(isDigit(peek(source, length))) advance(source, length);
+
+  if(peek(source, length) == '.' && isDigit(peekNext(source, length))) {
+    // Consume "."
+    advance(source, length);
+
+    while(isDigit(peek(source, length))) advance(source, length);
+  }
+
+  addToken(tokens, NUMBER, source);
+}
+
+void identifier(List *tokens, char *source, int length) {
+  while(isAlphanumeric(peek(source, length))) advance(source, length);
+
+  // TODO: Handle keywords (need to create my own Hash Map)
+
+  addToken(tokens, IDENTIFIER, source);
+}
+// End scanner
+
 void runFile(char *filename) {
-  trim(filename, filename);
+  filename = trim(filename);
   printf("Running file \"%s\"... ", filename);
 
   FILE *file = fopen(filename, "r");
 
   if(!file) {
     printf("[ERROR] Could not open file.\n");
+    free(filename);
+
     return;
   }
   printf("\n\n");
@@ -151,34 +331,68 @@ void runFile(char *filename) {
   int buffSize = 0;
   char *buffer = getFileStream(file, &buffSize);
 
-  trim(buffer, buffer);
+  char *aux = buffer; // So we don't lose the original pointer
+
+  buffer = trim(buffer);
   buffSize = strlen(buffer);
 
   run(buffer, buffSize);
 
+  // Freeing allocated memory
+  free(filename);
+
+  free(aux);
   free(buffer);
+
   fclose(file);
 }
 
 void runPrompt() {
-  char buffer[BUFFER_SIZE] = { 0 };
+  char *buffer = myMalloc(char, BUFFER_SIZE),
+       *aux = buffer;
 
   printf("Starting REPL...\n");
   printf("Lox > ");
 
   while(fgets(buffer, BUFFER_SIZE, stdin)) {
-    trim(buffer, buffer);
+    buffer = trim(buffer);
+
     run(buffer, strlen(buffer));
     printf("Lox > ");
 
     hadError = false;
+
+    // Restarting the buffers
+    free(aux);
+    free(buffer);
+
+    buffer = myMalloc(char, BUFFER_SIZE);
+    aux = buffer;
   }
 
   printf("\n");
+  free(buffer);
 }
 
 void run(char *buffer, int size) {
-  Scanner *scanner = createScanner(buffer);
-  printList(scanTokens(scanner));
-  freeScanner(scanner);
+  // Initialize scanner
+  start = 0;
+  current = 0;
+  line = 1;
+  List *tokens = scanTokens(buffer, size);
+
+  printf("(%d bytes) \"%s\"\n\tTokens: ", size, buffer);
+  printList(tokens);
+
+  // Freeing scanner
+  freeList(tokens);
+}
+
+void error(int line, char *message) {
+  report(line, "", message);
+}
+
+void report(int line, char *where, char *message) {
+  fprintf(stderr, "[line %d] Error %s: %s\n", line, where, message);
+  hadError = true;
 }

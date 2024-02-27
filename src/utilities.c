@@ -19,7 +19,7 @@ int rtrim(char *str, int len) {
 char *substring(char *src, int start, int end) {
   int size = (end - start);
   char *dest = myMalloc(char, size + 1);
-  memset(dest, 0, sizeof(char));
+  memset(dest, 0, size + 1);
 
   int i = 0;
   for (i = 0; i < size; i++) dest[i] = src[i + start];
@@ -28,17 +28,23 @@ char *substring(char *src, int start, int end) {
   return dest;
 }
 
-void trim(char *dest, char *src) {
-  if(src[0] == '\n') {
-    src[0] = '\0';
-    return;
-  }
+char *trim(char *src) {
+  char *out = NULL;
 
-  int len   = strlen(src) - 1,
+  if(src[0] == '\n' || src[0] == '\0') {
+    out = myMalloc(char, 1);
+    out[0] = '\0';
+
+    return out;
+  }
+  
+  int len = strlen(src),
       start = ltrim(src, len),
       end   = rtrim(src, len);
 
-  dest = substring(src, start, end);
+  out = substring(src, start, end);
+  
+  return out;
 }
 
 char *getFileStream(FILE *file, int *len) {

@@ -27,7 +27,7 @@ typedef enum token_e {
 
 typedef struct token_t {
   TokenType type;
-  char lexeme[BUFFER_SIZE];
+  char *lexeme;
   float literal;
   int line;
 
@@ -36,5 +36,6 @@ typedef struct token_t {
 Token *createToken(char *str, TokenType type, int line);
 Token *createCToken(char c, TokenType type, int line);
 void printToken(Token *token);
+void freeToken(Token *token);
 
 #endif

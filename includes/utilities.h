@@ -6,6 +6,13 @@
 
 // Macros
 #define myMalloc(type, len) ((type *) malloc(sizeof(type) * len))
+#define isDigit(c) (c >= '0' && c <= '9')
+#define isAlpha(c) (\
+                     (c >= 'A' && c <= 'Z') ||\
+                     (c >= 'a' && c <= 'z') ||\
+                     (c == '_')\
+                   )
+#define isAlphanumeric(c) (isAlpha(c) || isDigit(c))
 #define isWhitespace(c) (\
                           (c == '\t') ||\
                           (c == '\n') ||\
@@ -27,9 +34,8 @@ typedef enum enum_e {
 // Custom string handling
 int rtrim(char *str, int len);
 int ltrim(char *str, int len);
-void trim(char *dest, char *src);
-char *char2str(char c);
 char *substring(char *src, int start, int end);
+char *trim(char *src);
 char *getFileStream(FILE *file, int *len);
 
 // Error reporting and handling and so

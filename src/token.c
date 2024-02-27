@@ -24,7 +24,10 @@ Token *createToken(char *str, TokenType type, int line) {
   Token *token = myMalloc(Token, 1);
   memset(token, 0, sizeof(Token));
 
+  token->lexeme = myMalloc(char, size + 1);
+  memset(token->lexeme, 0, size + 1);
   strncpy(token->lexeme, str, size);
+
   token->type = type;
   token->line = line;
 
@@ -43,3 +46,7 @@ void printToken(Token *token) {
   if(token->type == NUMBER) printf(" (%f)", token->literal);
 }
 
+void freeToken(Token *token) {
+  free(token->lexeme);
+  free(token);
+}

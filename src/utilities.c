@@ -30,14 +30,19 @@ char *substring(char *src, int start, int end) {
 
 char *trim(char *src) {
   char *out = NULL;
+  int origLen = strlen(src);
 
-  if(src[0] == '\n' || src[0] == '\0') {
+  int c = 0;
+  for (c = 0; c < origLen; c++)
+    if(!isWhitespace(src[c])) break;
+
+  if(c >= origLen) {
     out = myMalloc(char, 1);
     out[0] = '\0';
 
     return out;
   }
-  
+
   int len = strlen(src),
       start = ltrim(src, len),
       end   = rtrim(src, len);

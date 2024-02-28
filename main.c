@@ -19,6 +19,12 @@ int start = 0;
 int current = 0;
 int line = 1;
 
+boolean isAtEnd(int c, int length);
+
+void addToken(List *tokens, TokenType type, char *source);
+void scanToken(List *tokens, char *source, int length);
+List *scanTokens(char *source, int length);
+
 char peek(char *source, int length);
 char peekNext(char *source, int length);
 char advance(char *source, int length);
@@ -27,10 +33,6 @@ boolean match(char expected, char *source, int length);
 void string(List *tokens, char *source, int length);
 void number(List *tokens, char *source, int length);
 void identifier(List *tokens, char *source, int length);
-
-void addToken(List *tokens, TokenType type, char *source);
-void scanToken(List *tokens, char *source, int length);
-List *scanTokens(char *source, int length);
 
 int main(int argc, char **argv) {
   if(argc > 2) {
@@ -45,10 +47,14 @@ int main(int argc, char **argv) {
   return 0;
 }
 
+boolean isAtEnd(int c, int length) {
+  return (c > length - 1);
+}
+
 List *scanTokens(char *source, int length) {
   List *tokens = createList();
 
-  while(current <= length) {
+  while(!isAtEnd(current, length)) {
     start = current;
     scanToken(tokens, source, length);
   }
@@ -90,11 +96,11 @@ void scanToken(List *tokens, char *source, int length) {
     case '/':
       if(match('/', source, length)) {
         // A comment goes until the end of the line
-        while(peek(source, length) != '\n' && current <= length) advance(source, length);
+        while(peek(source, length) != '\n' && !isAtEnd(current, length))
+          advance(source, length);
       } else addToken(tokens, SLASH, source);
     break;
 
-    // TODO: Fix trim function so it doesn't fucking break when entering a single space
     case ' ':
     case '\r':
     case '\t':
@@ -130,7 +136,8 @@ void addToken(List *list, TokenType type, char *source) {
 
 // Like advance but without consuming the character (only lookahead)
 char peek(char *source, int length) {
-  if(current >= length) return '\0';
+  if(isAtEnd(current, length)) return '\0';
+
   return source[current];
 }
 
@@ -147,7 +154,7 @@ char advance(char *source, int length) {
 
 // peek() + advance()
 boolean match(char expected, char *source, int length) {
-  if(current >= length) return false;
+  if(isAtEnd(current, length)) return false;
   if(source[current] != expected) return false;
 
   current++;
@@ -156,12 +163,12 @@ boolean match(char expected, char *source, int length) {
 
 // TODO: Fix that weird "error" that pops when inserting strings
 void string(List *tokens, char *source, int length) {
-  while(peek(source, length) != '"' && current <= length) {
+  while(peek(source, length) != '"' && !isAtEnd(current, length)) {
     if(peek(source, length) == '\n') line++;
     advance(source, length);
   }
 
-  if(current >= length) {
+  if(isAtEnd(current, length)) {
     error(line, "Unterminated string.");
     return;
   }

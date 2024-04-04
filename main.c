@@ -226,22 +226,22 @@ void identifier(List *tokens, char *source, int length) {
   // TODO: Handle keywords (need to create my own Hash Map)
   TokenType tokenType = IDENTIFIER;
   char *str = substring(source, start, current);
-  if(strcmp(str,      "and"   ) == 0) tokenType = AND;
-  else if(strcmp(str, "class" ) == 0) tokenType = CLASS;
-  else if(strcmp(str, "else"  ) == 0) tokenType = ELSE;
-  else if(strcmp(str, "false" ) == 0) tokenType = FALSE;
-  else if(strcmp(str, "for"   ) == 0) tokenType = FOR;
-  else if(strcmp(str, "fun"   ) == 0) tokenType = FUN;
-  else if(strcmp(str, "if"    ) == 0) tokenType = IF;
-  else if(strcmp(str, "nil"   ) == 0) tokenType = NIL;
-  else if(strcmp(str, "or"    ) == 0) tokenType = OR;
-  else if(strcmp(str, "print" ) == 0) tokenType = PRINT;
-  else if(strcmp(str, "return") == 0) tokenType = RETURN;
-  else if(strcmp(str, "super" ) == 0) tokenType = SUPER;
-  else if(strcmp(str, "this"  ) == 0) tokenType = THIS;
-  else if(strcmp(str, "true"  ) == 0) tokenType = TRUE;
-  else if(strcmp(str, "var"   ) == 0) tokenType = VAR;
-  else if(strcmp(str, "while" ) == 0) tokenType = WHILE;
+  if(!strcmp(str,      "and"   )) tokenType = AND;
+  else if(!strcmp(str, "class" )) tokenType = CLASS;
+  else if(!strcmp(str, "else"  )) tokenType = ELSE;
+  else if(!strcmp(str, "false" )) tokenType = FALSE;
+  else if(!strcmp(str, "for"   )) tokenType = FOR;
+  else if(!strcmp(str, "fun"   )) tokenType = FUN;
+  else if(!strcmp(str, "if"    )) tokenType = IF;
+  else if(!strcmp(str, "nil"   )) tokenType = NIL;
+  else if(!strcmp(str, "or"    )) tokenType = OR;
+  else if(!strcmp(str, "print" )) tokenType = PRINT;
+  else if(!strcmp(str, "return")) tokenType = RETURN;
+  else if(!strcmp(str, "super" )) tokenType = SUPER;
+  else if(!strcmp(str, "this"  )) tokenType = THIS;
+  else if(!strcmp(str, "true"  )) tokenType = TRUE;
+  else if(!strcmp(str, "var"   )) tokenType = VAR;
+  else if(!strcmp(str, "while" )) tokenType = WHILE;
   else tokenType = IDENTIFIER;
 
   free(str);

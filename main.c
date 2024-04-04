@@ -5,23 +5,6 @@
 #include "./includes/token.h"
 #include "./includes/utilities.h"
 
-// Token Map Hash
-#define TOKEN_MAP_SIZE 17
-
-typedef struct token_map_t {
-  char *key;
-  TokenType value;
-} TokenMap;
-
-unsigned int hash_function(char *str) {
-  unsigned int i = 0;
-
-  for(int j = 0; str[j]; j++) i += str[j];
-
-  return (i % TOKEN_MAP_SIZE);
-}
-// Token Map Hash
-
 void runFile(char *filename);
 void runPrompt();
 void run(char *buffer, int size);
